@@ -10,6 +10,12 @@ class DrawInformation:
     GREY = 128, 128, 128
     BACKGROUND_COLOR = WHITE
 
+    GRADIENTS = [
+        (128, 128, 128),
+        (160, 160, 160),
+        (192, 192, 192)
+    ]
+
     SIDE_PAD = 100
     TOP_PAD = 150
 
@@ -31,9 +37,35 @@ class DrawInformation:
         self.min_val = min(lst)
 
         self.block_width = round((self.width - self.SIDE_PAD) / len(lst))
-        self.block_height = round((self.height - self.TOP_PAD) / (self.max_val - self.min_val))
-        self.start_x = self.SIDE_PAD // 2
+        # take the whole drawable width area (without the padding) and dividing it by the number of the list elements
+        # the width of the element would then be relative to how many elements we have
 
+        self.block_height = round((self.height - self.TOP_PAD) / (self.max_val - self.min_val))
+        # subtracting max from min val will tell us the number of values we have and then adjust the height relative to that number
+        # the bigger the range, the smaller the scale
+
+        self.start_x = self.SIDE_PAD // 2
+        # top left corner in (x,y) for pygame is (0, 0)
+
+def draw(draw_info):
+    draw_info.window.fill(draw_info.BACKGROUND_COLOR)
+    draw_list(draw_info)
+    pygame.display.update()
+
+
+def draw_list(draw_info):
+    lst = draw_info.lst
+
+    for i, val in enumerate(lst):
+        x = draw_info.start_x + i * draw_info.block_width
+        # if it is the first rectangle, we start from 50 on the x and so on
+        y = draw_info.height - (val - draw_info.min_val) * draw_info.block_height
+        # figure out what the height of the rectangle needs to be, then subtract it from the overall height of the screen
+
+        color = draw_info.GRADIENTS[i % 3]
+        # iterate over colors 0, 1, 2
+
+        pygame.draw.rect(draw_info.window, color, (x, y, draw_info.block_width, draw_info.height))
 
 def generate_starting_list(n, min_val, max_val):
     lst = []
@@ -58,7 +90,8 @@ def main():
     while run:
         clock.tick(60)
 
-        pygame.display.update()
+        draw(draw_info)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
