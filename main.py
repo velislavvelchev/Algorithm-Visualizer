@@ -168,7 +168,7 @@ def main():
     sorting_algorithm_generator = None
 
     while run:
-        clock.tick(10)
+        clock.tick(30)
 
         if sorting:
             try:
